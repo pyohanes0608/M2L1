@@ -107,13 +107,39 @@ async def pokemon(ctx, *, name: str = None): # Menambahkan '*' agar nama dengan 
         await msg.edit(content=f"Pokémon dengan nama/ID '**{pokemon_input}**' tidak ditemukan. Periksa kembali input Anda!")
 
 
-
+# Daftar caption acak yang bisa Anda ubah sesuai keinginan
+CAPTIIONS = [
+    "Haha, so relatable! 🤣",
+    "A modern-day masterpiece. 🎭",
+    "This meme is sponsored by laziness. ☕",
+    "When reality doesn't match expectations... 🥲",
+    "Don't try this at home, guys! ❌",
+    "POV: You're coding and run into an error. 💻"
+]
 
 @bot.command()
 async def mem(ctx):
-    img_name = random.choice(os.listdir('images'))
-    with open(f'images/{img_name}', 'rb') as f:
-        picture = discord.File(f)
-    await ctx.send(file=picture)
+    # 1. Tentukan path folder 'images' secara absolut
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    images_dir = os.path.join(base_dir, 'images')
+    
+    try:
+        # 2. Pilih gambar secara acak
+        img_name = random.choice(os.listdir(images_dir))
+        img_path = os.path.join(images_dir, img_name)
+        
+        # 3. Pilih caption secara acak dari list di atas
+        random_caption = random.choice(CAPTIIONS)
+        
+        # 4. Buka file dan kirim gambar BESERTA caption-nya
+        with open(img_path, 'rb') as f:
+            picture = discord.File(f)
+            # Menggunakan parameter 'content' untuk teks caption
+            await ctx.send(content=random_caption, file=picture)
+            
+    except FileNotFoundError:
+        await ctx.send("Oh no, the 'images' folder wasn't found!")
+    except IndexError:
+        await ctx.send("The 'images' folder is empty; please fill it with images first!")
 
 bot.run(token)
